@@ -153,10 +153,6 @@ require("lazy").setup({
 			capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
 			local servers = {
-				clangd = {
-					init_options = { clangdFileStatus = true },
-					filetypes = { "c" },
-				},
 
 				gopls = {
 					settings = {
@@ -175,9 +171,15 @@ require("lazy").setup({
 				},
 
 				rust_analyzer = {},
+				pyright = {},
 				templ = {},
 				cssls = {},
 				tsserver = {},
+
+				clangd = {
+					init_options = { clangdFileStatus = true },
+					filetypes = { "c" },
+				},
 
 				lua_ls = {
 					settings = {
