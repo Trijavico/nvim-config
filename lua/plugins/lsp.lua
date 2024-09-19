@@ -98,7 +98,8 @@ return {
 			pyright = {},
 			templ = {},
 			cssls = {},
-			tsserver = {},
+			ts_ls = {},
+			omnisharp = {},
 
 			clangd = {
 				init_options = { clangdFileStatus = true },
@@ -137,6 +138,7 @@ return {
 		require("conform").setup({
 			formatters_by_ft = {
 				lua = { "stylua" },
+				csharp = { "csharpier" },
 			},
 		})
 
