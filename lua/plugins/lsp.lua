@@ -99,11 +99,58 @@ return {
 			templ = {},
 			cssls = {},
 			ts_ls = {},
-			omnisharp = {},
+			codelldb = {},
+
+			emmet_ls = {
+				filetypes = {
+					"html",
+					"css",
+					"templ",
+				},
+
+				init_options = {
+					html = {
+						options = {
+							["bem.enabled"] = true,
+						},
+					},
+				},
+			},
+
+			html = {
+				filetypes = { "html", "templ" },
+			},
+			htmx = {
+				filetypes = { "html", "templ" },
+			},
 
 			clangd = {
 				init_options = { clangdFileStatus = true },
-				filetypes = { "c" },
+				filetypes = { "c", "cpp" },
+			},
+
+			omnisharp = {
+				cmd = { "dotnet", "/home/ajpz/.local/share/nvim/mason/packages/omnisharp/libexec/OmniSharp.dll" },
+				settings = {
+					FormattingOptions = {
+						EnableEditorConfigSupport = true,
+					},
+					MsBuild = {
+						LoadProjectsOnDemand = true,
+					},
+					RoslynExtensionsOptions = {
+						-- Enables support for roslyn analyzers, code fixes and rulesets.
+						EnableAnalyzersSupport = true,
+						-- Enables support for showing unimported types and unimported extension
+						-- methods in completion lists. When committed, the appropriate using
+						-- directive will be added at the top of the current file. This option can
+						EnableImportCompletion = true,
+					},
+					Sdk = {
+						IncludePrereleases = true,
+					},
+				},
+				filetypes = { "cs", "vb", "csproj", "sln", "slnx", "props", "csx", "targets" },
 			},
 
 			lua_ls = {
@@ -139,6 +186,7 @@ return {
 			formatters_by_ft = {
 				lua = { "stylua" },
 				csharp = { "csharpier" },
+				cpp = { "clang-format" },
 			},
 		})
 
