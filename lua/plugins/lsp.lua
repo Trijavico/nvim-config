@@ -100,12 +100,16 @@ return {
 			cssls = {},
 			ts_ls = {},
 			codelldb = {},
+			astro = {},
+			tailwindcss = {},
+			elixirls = {},
 
 			emmet_ls = {
 				filetypes = {
 					"html",
 					"css",
 					"templ",
+					"javascriptreact",
 				},
 
 				init_options = {
@@ -117,16 +121,17 @@ return {
 				},
 			},
 
-			html = {
-				filetypes = { "html", "templ" },
-			},
 			htmx = {
 				filetypes = { "html", "templ" },
 			},
 
 			clangd = {
+				cmd = {
+					"clangd",
+					"--fallback-style=none",
+				},
 				init_options = { clangdFileStatus = true },
-				filetypes = { "c", "cpp" },
+				filetypes = { "h", "c", "cpp", "cc", "objc", "objcpp" },
 			},
 
 			omnisharp = {
@@ -186,7 +191,6 @@ return {
 			formatters_by_ft = {
 				lua = { "stylua" },
 				csharp = { "csharpier" },
-				cpp = { "clang-format" },
 			},
 		})
 

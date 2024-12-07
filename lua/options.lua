@@ -1,5 +1,8 @@
 local opt = vim.opt
 
+opt.breakindent = true
+opt.linebreak = true
+
 opt.inccommand = "split"
 opt.shiftwidth = 4
 opt.smartindent = true
