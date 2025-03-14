@@ -1,207 +1,119 @@
-return {
-	"neovim/nvim-lspconfig",
-	dependencies = {
-		{ "williamboman/mason.nvim", config = true },
-		"williamboman/mason-lspconfig.nvim",
-		"WhoIsSethDaniel/mason-tool-installer.nvim",
-
-		{ "j-hui/fidget.nvim", opts = {} },
-
-		{ "folke/neodev.nvim", opts = {} },
-
-		"hrsh7th/nvim-cmp",
-		-- Autoformating
-		"stevearc/conform.nvim",
+require("lazydev").setup({
+	library = {
+		{ path = "${3rd}/luv/library", words = { "vim%.uv" } },
 	},
-	config = function()
-		vim.api.nvim_create_autocmd("LspAttach", {
-			group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
-			callback = function(event)
-				local map = function(keys, func, desc)
-					vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
-				end
+})
 
-				map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
+vim.api.nvim_create_autocmd("LspAttach", {
+	desc = "LSP actions",
+	callback = function(event)
+		local opts = { buffer = event.buf }
 
-				map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
+		vim.keymap.set("n", "K", "<cmd>lua vim.lsp.buf.hover()<cr>", opts)
+		vim.keymap.set("n", "gd", "<cmd>lua vim.lsp.buf.definition()<cr>", opts)
+		vim.keymap.set("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<cr>", opts)
+		vim.keymap.set("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
+		vim.keymap.set("n", "go", "<cmd>lua vim.lsp.buf.type_definition()<cr>", opts)
+		vim.keymap.set("n", "gr", "<cmd>lua vim.lsp.buf.references()<cr>", opts)
+		vim.keymap.set("n", "gs", "<cmd>lua vim.lsp.buf.signature_help()<cr>", opts)
+		vim.keymap.set("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<cr>", opts)
+		vim.keymap.set({ "n", "x" }, "<leader>f", "<cmd>lua vim.lsp.buf.format({async = true})<cr>", opts)
+		vim.keymap.set("n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<cr>", opts)
+	end
+})
 
-				map("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
+require("mason").setup({})
+require("mason-lspconfig").setup({
+	ensure_installed = {
+		"lua_ls",
+		"gopls",
+		"clangd",
+		"rust_analyzer",
+		"emmet_ls",
+		"pyright",
+		"cssls",
+		"tailwindcss",
+		"templ",
+		"volar",
+		"ts_ls",
+	}
+})
 
-				map("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
+require("lspconfig").rust_analyzer.setup({})
+require("lspconfig").pyright.setup({})
+require("lspconfig").tailwindcss.setup({})
+require("lspconfig").cssls.setup({})
 
-				map("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
-
-				map("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
-
-				map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
-
-				map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
-
-				map("K", vim.lsp.buf.hover, "Hover Documentation")
-
-				map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
-
-				local client = vim.lsp.get_client_by_id(event.data.client_id)
-				if client and client.server_capabilities.documentHighlightProvider then
-					local highlight_augroup = vim.api.nvim_create_augroup("kickstart-lsp-highlight", { clear = false })
-					vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-						buffer = event.buf,
-						group = highlight_augroup,
-						callback = vim.lsp.buf.document_highlight,
-					})
-
-					vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-						buffer = event.buf,
-						group = highlight_augroup,
-						callback = vim.lsp.buf.clear_references,
-					})
-
-					vim.api.nvim_create_autocmd("LspDetach", {
-						group = vim.api.nvim_create_augroup("kickstart-lsp-detach", { clear = true }),
-						callback = function(event2)
-							vim.lsp.buf.clear_references()
-							vim.api.nvim_clear_autocmds({ group = "kickstart-lsp-highlight", buffer = event2.buf })
-						end,
-					})
-				end
-
-				if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
-					map("<leader>th", function()
-						vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
-					end, "[T]oggle Inlay [H]ints")
-				end
-			end,
-		})
-
-		local capabilities = vim.lsp.protocol.make_client_capabilities()
-		capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
-
-		local servers = {
-
-			gopls = {
-				settings = {
-					gopls = {
-						hints = {
-							assingVariableTypes = true,
-							compositeLiteralFields = true,
-							compositeLiteralTypes = true,
-							constantValues = true,
-							functionTypeParameters = true,
-							parameterNames = true,
-							rangeVariableTypes = true,
-						},
-					},
-				},
+require("lspconfig").gopls.setup({
+	settings = {
+		gopls = {
+			hints = {
+				assingVariableTypes = true,
+				compositeLiteralFields = true,
+				compositeLiteralTypes = true,
+				constantValues = true,
+				functionTypeParameters = true,
+				parameterNames = true,
+				rangeVariableTypes = true,
 			},
+		},
+	}
+})
 
-			rust_analyzer = {},
-			pyright = {},
-			templ = {},
-			cssls = {},
-			ts_ls = {},
-			codelldb = {},
-			astro = {},
-			tailwindcss = {},
-			elixirls = {},
+require("lspconfig").clangd.setup({
+	cmd = {
+		"clangd",
+		"--fallback-style=none",
+	},
+	init_options = { clangdFileStatus = true },
+	filetypes = { "h", "c", "cpp", "cc", "objc", "objcpp" },
+})
 
-			emmet_ls = {
-				filetypes = {
-					"html",
-					"css",
-					"templ",
-					"javascriptreact",
-				},
-
-				init_options = {
-					html = {
-						options = {
-							["bem.enabled"] = true,
-						},
-					},
-				},
+require("lspconfig").emmet_ls.setup({
+	filetypes = {
+		"html",
+		"css",
+		"templ",
+		"vue",
+		"javascriptreact",
+	},
+	init_options = {
+		html = {
+			options = {
+				["bem.enabled"] = true,
+				["output.format"] = false,
 			},
+		},
+	}
+})
 
-			htmx = {
-				filetypes = { "html", "templ" },
+require("lspconfig").volar.setup({
+	init_options = {
+		vue = {
+			hybridMode = false
+		},
+	}
+})
+
+local vue_lsp_path = require("mason-registry").get_package("vue-language-server"):get_install_path() .. "/node_modules/@vue/language-server"
+require("lspconfig").ts_ls.setup({
+	init_options = {
+		plugins = {
+			{
+				name = "@vue/typescript-plugin",
+				location = vue_lsp_path,
+				languages = { "vue" },
 			},
+		},
+	}
+})
 
-			clangd = {
-				cmd = {
-					"clangd",
-					"--fallback-style=none",
-				},
-				init_options = { clangdFileStatus = true },
-				filetypes = { "h", "c", "cpp", "cc", "objc", "objcpp" },
+require("lspconfig").lua_ls.setup({
+	settings = {
+		Lua = {
+			completion = {
+				callSnippet = "Replace",
 			},
-
-			omnisharp = {
-				cmd = { "dotnet", "/home/ajpz/.local/share/nvim/mason/packages/omnisharp/libexec/OmniSharp.dll" },
-				settings = {
-					FormattingOptions = {
-						EnableEditorConfigSupport = true,
-					},
-					MsBuild = {
-						LoadProjectsOnDemand = true,
-					},
-					RoslynExtensionsOptions = {
-						-- Enables support for roslyn analyzers, code fixes and rulesets.
-						EnableAnalyzersSupport = true,
-						-- Enables support for showing unimported types and unimported extension
-						-- methods in completion lists. When committed, the appropriate using
-						-- directive will be added at the top of the current file. This option can
-						EnableImportCompletion = true,
-					},
-					Sdk = {
-						IncludePrereleases = true,
-					},
-				},
-				filetypes = { "cs", "vb", "csproj", "sln", "slnx", "props", "csx", "targets" },
-			},
-
-			lua_ls = {
-				settings = {
-					Lua = {
-						completion = {
-							callSnippet = "Replace",
-						},
-					},
-				},
-			},
-		}
-
-		require("mason").setup()
-
-		local ensure_installed = vim.tbl_keys(servers or {})
-		vim.list_extend(ensure_installed, {
-			"stylua", -- Used to format Lua code
-		})
-		require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
-
-		require("mason-lspconfig").setup({
-			handlers = {
-				function(server_name)
-					local server = servers[server_name] or {}
-					server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-					require("lspconfig")[server_name].setup(server)
-				end,
-			},
-		})
-
-		require("conform").setup({
-			formatters_by_ft = {
-				lua = { "stylua" },
-				csharp = { "csharpier" },
-			},
-		})
-
-		vim.api.nvim_create_autocmd("BufWritePre", {
-			callback = function(args)
-				require("conform").format({
-					bufnr = args.buf,
-					lsp_fallback = true,
-					quiet = true,
-				})
-			end,
-		})
-	end,
-}
+		},
+	},
+})

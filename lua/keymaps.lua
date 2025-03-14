@@ -1,10 +1,11 @@
 local set = vim.keymap.set
 
-set("n", "<leader><leader>", "<cmd>source %<CR>", { desc = "Execute the current file" })
+set("n", "<Tab>j", "<cmd>cnext<CR>", { noremap = true })
+set("n", "<Tab>k", "<cmd>cprev<CR>", { noremap = true })
 
 set("n", "<leader>pv", ":Explore <CR>")
 
-set("n", "<leader>e", vim.diagnostic.open_float)
+set("n", "<leader>d", vim.diagnostic.open_float)
 set("n", "]d", vim.diagnostic.goto_next)
 set("n", "[d", vim.diagnostic.goto_prev)
 
